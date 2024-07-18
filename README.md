@@ -30,7 +30,9 @@ To install and run the project locally, follow these steps:
 
 1. Clone the repository:
 
-   `Currenly no repository`
+   ```
+   https://github.com/ataavohra-tatvasoft/inventory-management-system.git
+   ```
 
 2. Install dependencies:
    `npm install`
