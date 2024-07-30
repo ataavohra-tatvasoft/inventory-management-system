@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { ObjectId } from 'mongodb'
+import { socketConfig } from '../../configs'
 import { Cart, Product, User } from '../../db/models'
 import { responseHandlerUtils } from '../../utils'
 import { Controller } from '../../types'
@@ -44,6 +45,8 @@ const addItemToNewCart: Controller = async (req: Request, res: Response) => {
     userId: user._id,
     items: [{ productId, attributeId, optionId, quantity }]
   })
+
+  socketConfig.getIO().emit('carts', { action: 'addNewItemToCart', cart: cart })
 
   return responseHandlerUtils.responseHandler(res, {
     statusCode: httpStatusConstant.OK,
@@ -109,6 +112,8 @@ const addItemToExistingCart: Controller = async (req: Request, res: Response) =>
 
   await cart.save()
 
+  socketConfig.getIO().emit('carts', { action: 'addItemToExistingCart', cart: cart })
+
   return responseHandlerUtils.responseHandler(res, {
     statusCode: httpStatusConstant.OK,
     message: httpErrorMessageConstant.SUCCESSFUL,
@@ -158,6 +163,8 @@ const removeItemFromCart: Controller = async (req: Request, res: Response) => {
   } else {
     throw new HttpError(messageConstant.PRODUCT_NOT_FOUND_IN_CART, httpStatusConstant.NOT_FOUND)
   }
+
+  socketConfig.getIO().emit('carts', { action: 'removeItemFromCart', cart: cart })
 
   return responseHandlerUtils.responseHandler(res, {
     statusCode: httpStatusConstant.OK,
@@ -223,6 +230,8 @@ const getCartItems: Controller = async (req: Request, res: Response) => {
     })
   )
 
+  socketConfig.getIO().emit('carts', { action: 'getCartItems', cartItems: cartItems })
+
   return responseHandlerUtils.responseHandler(res, {
     statusCode: httpStatusConstant.OK,
     message: httpErrorMessageConstant.SUCCESSFUL,
@@ -254,6 +263,8 @@ const deactivateCart: Controller = async (req: Request, res: Response) => {
     )
   }
 
+  socketConfig.getIO().emit('carts', { action: 'deactivateCart', cart: updatedCart })
+
   return responseHandlerUtils.responseHandler(res, {
     statusCode: httpStatusConstant.OK,
     message: messageConstant.CART_DEACTIVATED_SOFT
@@ -273,6 +284,8 @@ const deleteCartPermanently: Controller = async (req: Request, res: Response) =>
       httpStatusConstant.INTERNAL_SERVER_ERROR
     )
   }
+
+  socketConfig.getIO().emit('carts', { action: 'deleteCartPermanently', cart: deletedCart })
 
   return responseHandlerUtils.responseHandler(res, {
     statusCode: httpStatusConstant.OK,

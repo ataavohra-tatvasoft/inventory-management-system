@@ -1,7 +1,7 @@
 import express, { Express } from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import { dbConfig, envConfig } from './src/configs'
+import { dbConfig, envConfig, socketConfig } from './src/configs'
 import { messageConstant } from './src/constants'
 import routes from './src/routes'
 import { errorHandlerUtils, loggerUtils } from './src/utils'
@@ -40,8 +40,13 @@ const startServer = async (app: Express): Promise<void> => {
     await dbConfig.connectToDatabase()
     loggerUtils.logger.info(messageConstant.APP_STARTED)
 
-    app.listen(envConfig.serverPort, () => {
+    const server = app.listen(envConfig.serverPort, () => {
       loggerUtils.logger.info(`Server started on port ${envConfig.serverPort}`)
+    })
+
+    const io = socketConfig.init(server)
+    io.on('connection', () => {
+      loggerUtils.logger.info('New client connected!')
     })
   } catch (error) {
     loggerUtils.logger.error('Error starting server: ', error)
