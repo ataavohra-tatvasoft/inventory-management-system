@@ -33,6 +33,9 @@ const productRatingSchema: Schema<IProductRating, ProductRatingModel> = new Sche
   }
 )
 
+// Create a compound unique index on productId and userId
+productRatingSchema.index({ productId: 1, userId: 1 }, { unique: true })
+
 export const ProductRating: ProductRatingModel = model<IProductRating, ProductRatingModel>(
   'productRatings',
   productRatingSchema

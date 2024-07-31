@@ -21,7 +21,6 @@ const attributeOptionSchema: Schema<IAttributeOption> = new Schema<IAttributeOpt
 const productAttributeSchema: Schema<IProductAttribute> = new Schema<IProductAttribute>({
   name: {
     type: String,
-    unique: true,
     required: true
   },
   options: {
@@ -44,7 +43,8 @@ const productSchema: Schema<IProduct, ProductModel> = new Schema<IProduct, Produ
     },
     name: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     description: {
       type: String,
@@ -60,7 +60,14 @@ const productSchema: Schema<IProduct, ProductModel> = new Schema<IProduct, Produ
     },
     attributes: {
       type: [productAttributeSchema],
-      required: true
+      required: true,
+      validate: {
+        validator: function (attributes: IProductAttribute[]) {
+          const attributeNames = attributes.map((attr) => attr.name)
+          return attributeNames.length === new Set(attributeNames).size
+        },
+        message: 'Attributes names should be unique within a product.'
+      }
     },
     deletedAt: {
       type: Date,

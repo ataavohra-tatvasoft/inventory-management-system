@@ -30,6 +30,8 @@ const productReviewSchema: Schema<IProductReview, ProductReviewModel> = new Sche
     timestamps: true
   }
 )
+// Create a compound unique index on productId and userId
+productReviewSchema.index({ productId: 1, userId: 1 }, { unique: true })
 
 export const ProductReview: ProductReviewModel = model<IProductReview, ProductReviewModel>(
   'productReviews',
